@@ -6,8 +6,9 @@
 const fs = require('fs');
 const path = require('path');
 const lzma = require('lzma-native');
-const yargs = require('yargs/yargs')
-const { hideBin } = require('yargs/helpers')
+const yargs = require('yargs/yargs');
+const tar = require('tar');
+const { hideBin } = require('yargs/helpers');
 
 const { y } = yargs(hideBin(process.argv))
     .usage('Usage: $0 <command> options')
@@ -23,12 +24,13 @@ const decompress = (file) => new Promise((resolve) => {
 
     console.log(`Decompressing ${file}`);
     const [ name, ext ] = file.split('.');
-    const out = fs.createWriteStream(path.join(
-        __dirname, '..', 'data', `${name}.${ext}`,
-    ));
     fs.createReadStream(path.join(
         __dirname, '..', 'data', file,
-    )).pipe(decompressor).pipe(out).on('finish', () => {
+    )).pipe(decompressor).pipe(tar.x({
+      C: path.join(
+        __dirname, '..', 'data',
+      ),
+    })).on('finish', () => {
         console.log(`Wrote ${name}.${ext}`);
         resolve();
     });

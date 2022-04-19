@@ -1,3 +1,5 @@
 .idea
-data/*.csv
 node_modules
+*.log
+data
+!data/*.tar.xz
